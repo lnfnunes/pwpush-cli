@@ -1,4 +1,3 @@
-'use strict';
 const meow = require('meow');
 const axios = require('axios')
 const querystring = require('querystring')
@@ -18,7 +17,7 @@ const cli = meow(`
     --help        Display this help information.
 
 	Example
-	  $ pwpush SuperSecret --days 1 --views 2
+	  $ pwpush MySuperSecretPassword --days 1 --views 2
 `, {
 	flags: {
 		days: {
@@ -66,7 +65,6 @@ axios({
 
     try {
       const $url = select(dom, "#url")[0]
-      console.clear()
       console.log($url.attribs.value)
     } catch(err) {
       console.error('Something gets wrong! No URL value was found!!')
