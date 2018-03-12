@@ -5,7 +5,7 @@
 
 ## Install
 ```shell
-npm i -g pwpush-cli
+npm install -g pwpush-cli
 ```
 
 ## Usage
@@ -15,14 +15,14 @@ pwpush MySuperSecretPassword [parameters]
 
 ## Parameters
 
-#### -d | --days
+### -d | --days
 Type: integer
 
 Default value: 7
 
 Days until the password is deleted. Default is 7
 
-#### -v | --views
+### -v | --views
 Type: integer
 
 Default value: 5

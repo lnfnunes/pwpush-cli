@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 const meow = require('meow');
 const axios = require('axios')
 const querystring = require('querystring')
