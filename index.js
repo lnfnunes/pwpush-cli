@@ -3,8 +3,7 @@
 const meow = require('meow');
 const axios = require('axios')
 const querystring = require('querystring')
-const htmlparser = require("htmlparser")
-const select = require('soupselect').select
+const HTMLParser = require('fast-html-parser');
 
 const cli = meow(`
 	Usage
@@ -41,39 +40,42 @@ const password = cli.input[0]
 const expire_days = cli.flags.days || 7
 const expire_views = cli.flags.views || 5
 
-const data = querystring.stringify({
+const reqData = querystring.stringify({
   'password[payload]': password,
   'password[expire_after_days]': expire_days,
   'password[expire_after_views]': expire_views,
   'password[deletable_by_viewer]': 'on',
 })
 
-axios({
+const reqOptions = {
   method: 'post',
   url: 'https://pwpush.com/p',
-  data: data,
+  data: reqData,
   headers: {
     'Content-Type': 'application/x-www-form-urlencoded',
     'Accept': 'text/html,application/xhtml+xml,application/xml',
   },
-})
-.then((response) => {
+}
+
+const onResponseComplete = (response) => {
   const rawHtml = response.data
-  const handler = new htmlparser.DefaultHandler((error, dom) => {
-    if (error) {
-      console.error('Error while parsing the HTML !', error)
-      process.exit()
-    }
+  const $dom = HTMLParser.parse(rawHtml)
 
-    try {
-      const $url = select(dom, "#url")[0]
-      console.log($url.attribs.value)
-    } catch(err) {
-      console.error('Something gets wrong! No URL value was found!!')
-    }
-  })
+  try {
+    getResultText($dom)
+  } catch(err) {
+    console.error(`Something gets wrong!! ${err}`)
+  }
+}
 
-  const parser = new htmlparser.Parser(handler)
-  parser.parseComplete(rawHtml)
-})
-.catch((error) => error)
+const getResultText = ($dom) => {
+  console.log(getExpirationDate($dom))
+  console.log(getUrlValue($dom))
+}
+
+const getUrlValue = ($dom) => `> ${$dom.querySelector('#url').attributes.value}`
+const getExpirationDate = ($dom) => $dom.querySelectorAll('p')[3].text.replace(/\n/g, ' ').trim()
+
+axios(reqOptions)
+  .then(onResponseComplete)
+  .catch(console.error)
