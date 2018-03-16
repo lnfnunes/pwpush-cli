@@ -1,44 +1,57 @@
 #!/usr/bin/env node
 
-const meow = require('meow');
+const parseArgs = require('minimist')
 const axios = require('axios')
 const querystring = require('querystring')
 const HTMLParser = require('fast-html-parser');
 
-const cli = meow(`
-	Usage
-	  $ pwpush <password> [parameters] [options]
+const DEFAULT_EXPIRE_DAYS = 7
+const DEFAULT_EXPIRE_VIEWS = 5
 
-	Parameters
-    -d | --days   Days until the password is deleted. Default is 7
-    -v | --views  Number of visualizations until the password is deleted. Default is 5
+const showHelp = (txt = '\r') => {
+  console.log(`${txt}
+    \rUsage:
+    \r  $ pwpush <password> [parameters] [options]
 
-  Options
-    --version     Display package version.
-    --help        Display this help information.
+    \rParameters
+    \r  --days | -d   Days until the password is deleted. Default is ${DEFAULT_EXPIRE_DAYS}
+    \r  --views | -v  Number of visualizations until the password is deleted. Default is ${DEFAULT_EXPIRE_VIEWS}
 
-	Example
-	  $ pwpush MySuperSecretPassword --days 1 --views 2
-`, {
-	flags: {
-		days: {
-			type: 'number',
-			alias: 'd'
-		},
-		views: {
-			type: 'number',
-			alias: 'v'
-		}
-	}
-})
+    \rOptions
+    \r  --version     Display package version.
+    \r  --help | -h   Display this help information.
 
-if (!cli.input.length) {
-  cli.showHelp()
+    \rExample
+    \r  $ pwpush MySuperSecretPassword --days 1 --views 2
+  `)
+  process.exit(0)
 }
 
-const password = cli.input[0]
-const expire_days = cli.flags.days || 7
-const expire_views = cli.flags.views || 5
+const cli = parseArgs(process.argv.slice(2), {
+  boolean: ['version', 'help'],
+  alias: {
+    d: 'days',
+    v: 'views',
+    h: 'help',
+  },
+  unknown: (value) => {
+    if (process.argv.slice(2, 3)[0] !== value) {
+      showHelp(`Unknown value: ${value}\n`)
+    }
+  },
+});
+
+if (!!cli.version) {
+  console.log(`${require('./package.json').version}`)
+  process.exit(0)
+}
+if (!!cli.help || !cli._[0]) {
+  showHelp()
+}
+
+const password = cli._[0]
+const expire_days = cli.days || DEFAULT_EXPIRE_DAYS
+const expire_views = cli.views || DEFAULT_EXPIRE_VIEWS
 
 const reqData = querystring.stringify({
   'password[payload]': password,
