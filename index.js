@@ -19,7 +19,7 @@ const showHelp = (txt = '\r') => {
 
     \rOptions
     \r  --version     Display package version.
-    \r  --help | -h   Display this help information.
+    \r  --help | -h   Display help usage information.
 
     \rExample
     \r  $ pwpush MySuperSecretPassword --days 1 --views 2
