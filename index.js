@@ -92,3 +92,10 @@ const getExpirationDate = ($dom) => $dom.querySelectorAll('p')[3].text.replace(/
 axios(reqOptions)
   .then(onResponseComplete)
   .catch(console.error)
+
+module.exports = {
+  password,
+  expire_days,
+  expire_views,
+  reqOptions
+}
