@@ -1,5 +1,7 @@
 # pwpush-cli [![Build Status](https://travis-ci.org/lnfnunes/pwpush-cli.svg?branch=master)](https://travis-ci.org/lnfnunes/pwpush-cli)
 
+[![pwpush-cli NPM](https://nodei.co/npm/pwpush-cli.png?downloads=true&downloadRank=true)](http://npmjs.org/package/pwpush-cli)
+
 > A nodeJS CLI wrapper to easily push passwords to pwpush.com
 
 ![image](https://user-images.githubusercontent.com/2450417/37249539-122d2056-24c8-11e8-860c-ca4609ef4073.png)
