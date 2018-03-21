@@ -6,8 +6,7 @@ const httpAdapter = require('axios/lib/adapters/http')
 const nock = require('nock')
 const pwpush = require('../lib/pwpush')
 
-const HOST = 'https://pwpush.com';
-axios.defaults.host = HOST;
+axios.defaults.host = pwpush.HOST;
 axios.defaults.adapter = httpAdapter;
 
 const objDefault = {
@@ -19,7 +18,7 @@ const htmlValid = fs.readFileSync(path.resolve(__dirname, 'fixture/htmlValid.htm
 const htmlInvalid = fs.readFileSync(path.resolve(__dirname, 'fixture/htmlInvalid.html'), 'utf-8')
 
 const mockRequest = (html) => {
-  const api = nock(HOST)
+  const api = nock(pwpush.HOST)
     .post('/p')
     .reply(200, html)
     .on('replied', (req) => {
@@ -43,7 +42,7 @@ test(`Should have ${objDefault.expire_views} as default value for --views flag`,
 test(`Should call pwpush.com with default request parameters`, (done) => {
   mockRequest(htmlValid)
   
-  pwpush.exec({password: objDefault.password})
+  pwpush({password: objDefault.password})
     .then((res) => {
       result = querystring.parse(res._.config.data)
       expected = {
@@ -61,7 +60,7 @@ test(`Should call pwpush.com with default request parameters`, (done) => {
 test(`Should call pwpush.com with custom request parameters`, (done) => {
   mockRequest(htmlValid)
   
-  pwpush.exec(
+  pwpush(
     {
       password: objDefault.password,
       expire_days: 1,
@@ -84,7 +83,7 @@ test(`Should call pwpush.com with custom request parameters`, (done) => {
 test(`Should return an text message if html response if valid`, (done) => {
   mockRequest(htmlValid)
   
-  pwpush.exec(
+  pwpush(
     {
       password: objDefault.password,
       expire_days: 1,
@@ -96,24 +95,21 @@ test(`Should return an text message if html response if valid`, (done) => {
     })
 });
 
-test(`Should return an error message if html response is invalid`, (done) => {
+test(`Should throw an error if html response is invalid`, (done) => {
   mockRequest(htmlInvalid)
-  
-  pwpush.exec(objDefault)
-    .then((res) => {
-      result = res.error
-      expected = 'Something gets wrong!!'
 
-      expect(result).toEqual(expected)
+  pwpush(objDefault)
+    .catch(err => {
+      expect(err).toEqual(Error(`Something gets wrong!!`))
       done()
     })
 });
 
-test(`Should throw and error if password was not provided`, () => {
+test(`Should throw an error if password was not provided`, () => {
   mockRequest(htmlValid)
 
   try {
-    pwpush.exec({
+    pwpush({
       expire_days: 1,
       expire_views: 1
     })

@@ -1,7 +1,7 @@
 {
   "name": "pwpush-cli",
   "description": "A nodeJS CLI wrapper to easily push passwords to pwpush.com",
-  "version": "0.1.7",
+  "version": "0.2.0",
   "author": {
     "name": "Leandro Nunes",
     "email": "dr1design@gmail.com",
@@ -28,10 +28,10 @@
   "bugs": {
     "url": "https://github.com/lnfnunes/pwpush-cli"
   },
-  "main": "index.js",
   "bin": {
-    "pwpush": "index.js"
+    "pwpush": "cli.js"
   },
+  "main": "cli.js",
   "engines": {
     "node": ">=6"
   },
@@ -42,7 +42,8 @@
   "dependencies": {
     "axios": "^0.18.0",
     "fast-html-parser": "^1.0.1",
-    "minimist": "^1.2.0"
+    "minimist": "^1.2.0",
+    "ora": "^2.0.0"
   },
   "devDependencies": {
     "coveralls": "^3.0.0",

@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 
+const ora = require('ora')
 const parseArgs = require('minimist')
 const pwpush = require('./lib/pwpush')
 
@@ -45,10 +46,18 @@ if (!!cli.help || !cli._[0]) {
   showHelp()
 }
 
-pwpush.exec({
+const spinner = ora().start()
+
+pwpush({
   password: cli._[0],
   expire_days: cli.days,
   expire_views: cli.views
 })
-.then(res => console.log(res.text))
-.catch(res => console.error(res.error))
+.then(res => {
+  spinner.succeed(res.text)
+  process.exit(0)
+})
+.catch(err => {
+  spinner.fail(err)
+  process.exit(1)
+})
