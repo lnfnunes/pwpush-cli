@@ -1,6 +1,7 @@
 sudo: false
 language: node_js
 node_js:
+  - 'node'
   - '8'
   - '6'
 cache:
@@ -12,4 +13,3 @@ script:
   - npm test
 after_success:
   - ./node_modules/.bin/coveralls < coverage/lcov.info
-
