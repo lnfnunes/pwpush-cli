@@ -48,7 +48,7 @@ Number of visualizations until the password is deleted.
 ## Options
 
 ###  --allow-weak
-Disable password OWASP strength verification. **Not recommended!!** \n
+Disable password strength verification. **Not recommended!!** \
 Read more about [OWASP security guideline](https://bit.ly/owasp-secure-guideline).
 
 ###  --version
