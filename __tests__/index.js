@@ -6,7 +6,12 @@ const httpAdapter = require('axios/lib/adapters/http')
 const nock = require('nock')
 const pwpush = require('../lib/pwpush')
 
-axios.defaults.host = pwpush.HOST;
+const DEFAULT_EXPIRE_DAYS = '7'
+const DEFAULT_EXPIRE_VIEWS = '5'
+const HOST = 'https://pwpush.com'
+const PERMALINK = `${HOST}/p`
+
+axios.defaults.host = HOST;
 axios.defaults.adapter = httpAdapter;
 
 const objDefault = {
@@ -14,13 +19,13 @@ const objDefault = {
   expire_days: '7',
   expire_views: '5'
 }
-const htmlValid = fs.readFileSync(path.resolve(__dirname, 'fixture/htmlValid.html'), 'utf-8')
-const htmlInvalid = fs.readFileSync(path.resolve(__dirname, 'fixture/htmlInvalid.html'), 'utf-8')
+const responseValid = require('./fixture/jsonValid.json')
+const responseInvalid = require('./fixture/jsonInvalid.json')
 
-const mockRequest = (html) => {
-  const api = nock(pwpush.HOST)
-    .post('/p')
-    .reply(200, html)
+const mockRequest = (json) => {
+  const api = nock(HOST)
+    .post('/p.json')
+    .reply(200, json)
     .on('replied', (req) => {
       expect(api.isDone()).toBe(true)
     })
@@ -33,14 +38,14 @@ afterEach(() => {
 })
 
 test(`Should have ${objDefault.expire_days} as default value for --days flag`, () => {
-  expect(pwpush.DEFAULT_EXPIRE_DAYS).toBe(objDefault.expire_days);
+  expect(DEFAULT_EXPIRE_DAYS).toBe(objDefault.expire_days);
 });
 test(`Should have ${objDefault.expire_views} as default value for --views flag`, () => {
-  expect(pwpush.DEFAULT_EXPIRE_VIEWS).toBe(objDefault.expire_views);
+  expect(DEFAULT_EXPIRE_VIEWS).toBe(objDefault.expire_views);
 });
 
 test(`Should call pwpush.com with default request parameters`, (done) => {
-  mockRequest(htmlValid)
+  mockRequest(responseValid)
   
   pwpush({password: objDefault.password})
     .then((res) => {
@@ -57,8 +62,8 @@ test(`Should call pwpush.com with default request parameters`, (done) => {
     })
 });
 
-test(`Should call pwpush.com with custom request parameters`, (done) => {
-  mockRequest(htmlValid)
+test(`Should call pwpush.com API with custom request parameters`, (done) => {
+  mockRequest(responseValid)
   
   pwpush(
     {
@@ -80,8 +85,8 @@ test(`Should call pwpush.com with custom request parameters`, (done) => {
     })
 });
 
-test(`Should return an text message if html response if valid`, (done) => {
-  mockRequest(htmlValid)
+test(`Should return an text message with generated link if json response if valid`, (done) => {
+  mockRequest(responseValid)
   
   pwpush(
     {
@@ -91,12 +96,13 @@ test(`Should return an text message if html response if valid`, (done) => {
     })
     .then((res) => {
       expect(res.text).toBeTruthy()
+      expect(res.text).toContain(`${PERMALINK}/${responseValid.url_token}`)
       done()
     })
 });
 
-test(`Should throw an error if html response is invalid`, (done) => {
-  mockRequest(htmlInvalid)
+test(`Should throw an Error with message "Something gets wrong!!" if json response is invalid`, (done) => {
+  mockRequest(responseInvalid)
 
   pwpush(objDefault)
     .catch(err => {
@@ -105,8 +111,8 @@ test(`Should throw an error if html response is invalid`, (done) => {
     })
 });
 
-test(`Should throw an error if password was not provided`, () => {
-  mockRequest(htmlValid)
+test(`Should throw an Error with message "A @password is required!" if password was not provided`, () => {
+  mockRequest(responseValid)
 
   try {
     pwpush({
