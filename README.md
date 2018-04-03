@@ -21,13 +21,13 @@ npm install -g pwpush-cli
 pwpush <password> [parameters] [options]
 
 # Long version
-pwpush p@ssw0rd --days 1 --views 2
+pwpush MyVerySecretP@sswd2BeBroken --days 1 --views 2
 
 # Short version
-pwpush p@ssw0rd -d 1 -v 2
+pwpush MyVerySecretP@sswd2BeBroken -d 1 -v 2
 ```
 
-**Tip:** The link shloud be automatically be copied into the clipboard.
+**Tip:** The secure generated link should be automatically be copied to the clipboard. Just paste it 🍻
 
 ## Parameters
 
@@ -36,7 +36,7 @@ pwpush p@ssw0rd -d 1 -v 2
 Type: `integer` \
 Default value: `7`
 
-Days until the password is deleted.
+Number of days until the password is deleted.
 
 ### --views | -v
 
@@ -46,6 +46,10 @@ Default value: `5`
 Number of visualizations until the password is deleted.
 
 ## Options
+
+###  --allow-weak
+Disable password OWASP strength verification. **Not recommended!!** \n
+Read more about [OWASP security guideline](https://bit.ly/owasp-secure-guideline).
 
 ###  --version
 Display package version.

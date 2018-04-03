@@ -15,7 +15,7 @@ axios.defaults.host = HOST;
 axios.defaults.adapter = httpAdapter;
 
 const objDefault = {
-  password: 'MySecretPassword',
+  password: 'MyVerySecretP@sswd2BeBroken',
   expire_days: '7',
   expire_views: '5'
 }
@@ -37,11 +37,54 @@ afterEach(() => {
   nock.cleanAll()
 })
 
+test(`Should throw an Error with message "A password is required!" if password was not provided`, () => {
+  expect(() => {
+    pwpush({
+      expire_days: 1,
+      expire_views: 1
+    })
+  })
+  .toThrowError(`A password is required!`)
+});
+test(`Should throw an Error with message "The password is too weak!" if password don't pass the OWASP test`, () => {
+  expect(() => {
+    pwpush({
+      password: 'weakP@ssword'
+    })
+  })
+  .toThrowError(`The password is too weak!`)
+});
+test(`Should throw an Error with message containing security issues about OWASP test requirements`, () => {
+  expect(() => {
+    pwpush({
+      password: 'p@ssw0rd'
+    })
+  })
+  .toThrowError(`The password must be at least 10 characters long`)
+});
+test(`Should throw an Error with message containing a link to OWASP security guideline`, () => {
+  expect(() => {
+    pwpush({
+      password: 'p@ssw0rd'
+    })
+  })
+  .toThrowError(`https://bit.ly/owasp-secure-guideline`)
+});
+
 test(`Should have ${objDefault.expire_days} as default value for --days flag`, () => {
   expect(DEFAULT_EXPIRE_DAYS).toBe(objDefault.expire_days);
 });
 test(`Should have ${objDefault.expire_views} as default value for --views flag`, () => {
   expect(DEFAULT_EXPIRE_VIEWS).toBe(objDefault.expire_views);
+});
+test(`Should allow weak password if --allow-weak flag is set`, () => {
+  expect(() => {  
+    pwpush(Object.assign({}, objDefault, {
+      password: 'weakpass',
+      allow_weak: true,
+    }))
+  })
+  .not.toThrow()
 });
 
 test(`Should call pwpush.com with default request parameters`, (done) => {
@@ -61,7 +104,6 @@ test(`Should call pwpush.com with default request parameters`, (done) => {
       done()
     })
 });
-
 test(`Should call pwpush.com API with custom request parameters`, (done) => {
   mockRequest(responseValid)
   
@@ -69,14 +111,14 @@ test(`Should call pwpush.com API with custom request parameters`, (done) => {
     {
       password: objDefault.password,
       expire_days: 1,
-      expire_views: 1
+      expire_views: 2,
     })
     .then((res) => {
       result = querystring.parse(res._.config.data)
       expected = {
         'password[payload]': objDefault.password,
         'password[expire_after_days]': '1',
-        'password[expire_after_views]': '1',
+        'password[expire_after_views]': '2',
         'password[deletable_by_viewer]': 'on',
       }
 
@@ -84,8 +126,7 @@ test(`Should call pwpush.com API with custom request parameters`, (done) => {
       done()
     })
 });
-
-test(`Should return an text message with generated link if json response if valid`, (done) => {
+test(`Should return an text message with "${PERMALINK}/${responseValid.url_token}" when response is valid`, (done) => {
   mockRequest(responseValid)
   
   pwpush(
@@ -100,8 +141,7 @@ test(`Should return an text message with generated link if json response if vali
       done()
     })
 });
-
-test(`Should throw an Error with message "Something gets wrong!!" if json response is invalid`, (done) => {
+test(`Should reject the promise with Error containing message "Something gets wrong!!" when response is invalid`, (done) => {
   mockRequest(responseInvalid)
 
   pwpush(objDefault)
@@ -109,17 +149,4 @@ test(`Should throw an Error with message "Something gets wrong!!" if json respon
       expect(err).toEqual(Error(`Something gets wrong!!`))
       done()
     })
-});
-
-test(`Should throw an Error with message "A @password is required!" if password was not provided`, () => {
-  mockRequest(responseValid)
-
-  try {
-    pwpush({
-      expire_days: 1,
-      expire_views: 1
-    })
-  } catch (err) {
-    expect(err).toEqual(Error(`A @password is required!`))
-  }
 });

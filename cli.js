@@ -14,6 +14,7 @@ const showHelp = (txt = '\r') => {
     \r  --views | -v  Number of visualizations until the password is deleted. Default is ${pwpush.DEFAULT_EXPIRE_VIEWS}
 
     \rOptions
+    \r  --allow-weak  Allow weak passwords to be used.
     \r  --version     Display package version.
     \r  --help | -h   Display help usage information.
 
@@ -25,7 +26,7 @@ const showHelp = (txt = '\r') => {
 }
 
 const cli = parseArgs(process.argv.slice(2), {
-  boolean: ['version', 'help'],
+  boolean: ['version', 'help', 'allow-weak'],
   alias: {
     d: 'days',
     v: 'views',
@@ -48,16 +49,21 @@ if (!!cli.help || !cli._[0]) {
 
 const spinner = ora().start()
 
-pwpush({
-  password: cli._[0],
-  expire_days: cli.days,
-  expire_views: cli.views
-})
-.then(res => {
-  spinner.succeed(res.text)
-  process.exit(0)
-})
-.catch(err => {
+try {
+  pwpush({
+    password: cli._[0],
+    expire_days: cli.days,
+    expire_views: cli.views,
+    allow_weak: cli['allow-weak'],
+  })
+  .then(res => {
+    spinner.succeed(res.text)
+    process.exit(0)
+  })
+  .catch(err => {
+    spinner.fail(err)
+    process.exit(1)
+  })
+} catch (err) {
   spinner.fail(err)
-  process.exit(1)
-})
+}
