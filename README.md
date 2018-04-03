@@ -20,9 +20,14 @@ npm install -g pwpush-cli
 ```bash
 pwpush <password> [parameters] [options]
 
-# Example
-pwpush MySuperSecretPassword --days 1 --views 2
+# Long version
+pwpush p@ssw0rd --days 1 --views 2
+
+# Short version
+pwpush p@ssw0rd -d 1 -v 2
 ```
+
+**Tip:** The link shloud be automatically be copied into the clipboard.
 
 ## Parameters
 

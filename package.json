@@ -48,6 +48,7 @@
   "dependencies": {
     "axios": "^0.18.0",
     "minimist": "^1.2.0",
+    "node-clipboard": "^1.2.0",
     "ora": "^2.0.0"
   },
   "devDependencies": {
