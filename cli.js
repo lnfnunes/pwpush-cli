@@ -10,8 +10,9 @@ const showHelp = (txt = '\r') => {
     \r  $ pwpush <password> [parameters] [options]
 
     \rParameters
-    \r  --days | -d   Days until the password is deleted. Default is ${pwpush.DEFAULT_EXPIRE_DAYS}
+    \r  --days  | -d  Days until the password is deleted. Default is ${pwpush.DEFAULT_EXPIRE_DAYS}
     \r  --views | -v  Number of visualizations until the password is deleted. Default is ${pwpush.DEFAULT_EXPIRE_VIEWS}
+    \r  --list  | -l  List last ${pwpush.DEFAULT_LAST_ITEMS} pushed passwords.
 
     \rOptions
     \r  --allow-weak  Allow weak passwords to be used.
@@ -26,10 +27,11 @@ const showHelp = (txt = '\r') => {
 }
 
 const cli = parseArgs(process.argv.slice(2), {
-  boolean: ['version', 'help', 'allow-weak'],
+  boolean: ['version', 'help', 'allow-weak', 'list'],
   alias: {
     d: 'days',
     v: 'views',
+    l: 'list',
     h: 'help',
   },
   unknown: (value) => {
@@ -45,6 +47,10 @@ if (!!cli.version) {
 }
 if (!!cli.help || !cli._[0]) {
   showHelp()
+}
+if (!!cli.list) {
+  console.log(pwpush.showHistory())
+  process.exit(0)
 }
 
 const spinner = ora().start()

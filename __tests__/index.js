@@ -8,11 +8,12 @@ const pwpush = require('../lib/pwpush')
 
 const DEFAULT_EXPIRE_DAYS = '7'
 const DEFAULT_EXPIRE_VIEWS = '5'
+const DEFAULT_LAST_ITEMS = '5'
 const HOST = 'https://pwpush.com'
 const PERMALINK = `${HOST}/p`
 
-axios.defaults.host = HOST;
-axios.defaults.adapter = httpAdapter;
+axios.defaults.host = HOST
+axios.defaults.adapter = httpAdapter
 
 const objDefault = {
   password: 'MyVerySecretP@sswd2BeBroken',
@@ -33,6 +34,9 @@ const mockRequest = (json) => {
   return api
 }
 
+beforeEach(() => {
+  pwpush.clearHistory()
+})
 afterEach(() => {
   nock.cleanAll()
 })
@@ -45,7 +49,7 @@ test(`Should throw an Error with message "A password is required!" if password w
     })
   })
   .toThrowError(`A password is required!`)
-});
+})
 test(`Should throw an Error with message "The password is too weak!" if password don't pass the OWASP test`, () => {
   expect(() => {
     pwpush({
@@ -53,7 +57,7 @@ test(`Should throw an Error with message "The password is too weak!" if password
     })
   })
   .toThrowError(`The password is too weak!`)
-});
+})
 test(`Should throw an Error with message containing security issues about OWASP test requirements`, () => {
   expect(() => {
     pwpush({
@@ -61,7 +65,7 @@ test(`Should throw an Error with message containing security issues about OWASP 
     })
   })
   .toThrowError(`The password must be at least 10 characters long`)
-});
+})
 test(`Should throw an Error with message containing a link to OWASP security guideline`, () => {
   expect(() => {
     pwpush({
@@ -69,14 +73,14 @@ test(`Should throw an Error with message containing a link to OWASP security gui
     })
   })
   .toThrowError(`https://bit.ly/owasp-secure-guideline`)
-});
+})
 
 test(`Should have ${objDefault.expire_days} as default value for --days flag`, () => {
-  expect(DEFAULT_EXPIRE_DAYS).toBe(objDefault.expire_days);
-});
+  expect(DEFAULT_EXPIRE_DAYS).toBe(objDefault.expire_days)
+})
 test(`Should have ${objDefault.expire_views} as default value for --views flag`, () => {
-  expect(DEFAULT_EXPIRE_VIEWS).toBe(objDefault.expire_views);
-});
+  expect(DEFAULT_EXPIRE_VIEWS).toBe(objDefault.expire_views)
+})
 test(`Should allow weak password if --allow-weak flag is set`, () => {
   expect(() => {  
     pwpush(Object.assign({}, objDefault, {
@@ -85,7 +89,7 @@ test(`Should allow weak password if --allow-weak flag is set`, () => {
     }))
   })
   .not.toThrow()
-});
+})
 
 test(`Should call pwpush.com with default request parameters`, (done) => {
   mockRequest(responseValid)
@@ -103,7 +107,7 @@ test(`Should call pwpush.com with default request parameters`, (done) => {
       expect(result).toEqual(expected)
       done()
     })
-});
+})
 test(`Should call pwpush.com API with custom request parameters`, (done) => {
   mockRequest(responseValid)
   
@@ -125,7 +129,7 @@ test(`Should call pwpush.com API with custom request parameters`, (done) => {
       expect(result).toEqual(expected)
       done()
     })
-});
+})
 test(`Should return an text message with "${PERMALINK}/${responseValid.url_token}" when response is valid`, (done) => {
   mockRequest(responseValid)
   
@@ -140,7 +144,7 @@ test(`Should return an text message with "${PERMALINK}/${responseValid.url_token
       expect(res.text).toContain(`${PERMALINK}/${responseValid.url_token}`)
       done()
     })
-});
+})
 test(`Should reject the promise with Error containing message "Something gets wrong!!" when response is invalid`, (done) => {
   mockRequest(responseInvalid)
 
@@ -149,4 +153,30 @@ test(`Should reject the promise with Error containing message "Something gets wr
       expect(err).toEqual(Error(`Something gets wrong!!`))
       done()
     })
-});
+})
+
+test(`Should clear the list of pushed passwords`, async () => {
+  pwpush.clearHistory()
+
+  const result = pwpush.showHistory().split('')
+  const expected = 0
+  expect(result).toHaveLength(expected)
+})
+test(`Should show a list of pushed password urls when --list flag is set`, async () => {
+  const max = parseInt(DEFAULT_LAST_ITEMS, 10)
+  for (let i=1; i<=max; i++) {
+    mockRequest(responseValid)
+    await pwpush({password: objDefault.password})
+
+    expect(pwpush.showHistory().split('\n')).toHaveLength(i)
+  }
+})
+test(`Should show a list with no more than ${DEFAULT_LAST_ITEMS} pushed password items`, async () => {
+  const max = parseInt(DEFAULT_LAST_ITEMS, 10)
+  for (let i=1; i<=max + 1; i++) {
+    mockRequest(responseValid)
+    await pwpush({password: objDefault.password})
+  }
+
+  expect(pwpush.showHistory().split('\n')).toHaveLength(max)
+})
