@@ -45,12 +45,12 @@ if (!!cli.version) {
   console.log(`${require('./package.json').version}`)
   process.exit(0)
 }
-if (!!cli.help || !cli._[0]) {
-  showHelp()
-}
 if (!!cli.list) {
   console.log(pwpush.showHistory())
   process.exit(0)
+}
+if (!!cli.help || !cli._[0]) {
+  showHelp()
 }
 
 const spinner = ora().start()
