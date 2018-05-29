@@ -6,7 +6,9 @@
 [![npm version][version-image]][version-url]
 [![Build Status][ci-image]][ci-url]
 [![Coverage Status][coverage-image]][coverage-url]
-[![Maintainability][quality-image]][quality-url]
+[![Maintainability][quality-image]][quality-url]\
+[![Downloads/month][npmcharts-image]][npmcharts-url]
+[![Download-size][download-size-image]][download-size-url]
 
 
 ![image](https://user-images.githubusercontent.com/2450417/37249539-122d2056-24c8-11e8-860c-ca4609ef4073.png)
@@ -75,3 +77,7 @@ Bug reports and Pull Requests are welcome!
 [coverage-url]: https://coveralls.io/github/lnfnunes/pwpush-cli?branch=master
 [quality-image]: https://api.codeclimate.com/v1/badges/bbb9ff8b5e698891fe56/maintainability
 [quality-url]: https://codeclimate.com/github/lnfnunes/pwpush-cli/maintainability
+[npmcharts-image]: https://img.shields.io/npm/dm/pwpush-cli.svg
+[npmcharts-url]: https://npmcharts.com/compare/pwpush-cli?minimal=true
+[download-size-image]: https://packagephobia.now.sh/badge?p=pwpush-cli
+[download-size-url]: https://packagephobia.now.sh/result?p=pwpush-cli
