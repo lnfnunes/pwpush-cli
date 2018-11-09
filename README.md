@@ -1,4 +1,7 @@
 # pwpush-cli
+
+[![Greenkeeper badge](https://badges.greenkeeper.io/lnfnunes/pwpush-cli.svg)](https://greenkeeper.io/)
+
 > A nodeJS CLI wrapper to easily push passwords to pwpush.com
 
 [![NPM][npm-image] ][npm-url]
