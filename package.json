@@ -55,7 +55,7 @@
   },
   "devDependencies": {
     "coveralls": "^3.0.1",
-    "husky": "^2.0.0",
+    "husky": "^3.0.0",
     "jest": "^23.6.0",
     "nock": "^10.0.4"
   }
