@@ -9,6 +9,7 @@ const pwpush = require('../lib/pwpush')
 const DEFAULT_EXPIRE_DAYS = '7'
 const DEFAULT_EXPIRE_VIEWS = '5'
 const DEFAULT_LAST_ITEMS = '5'
+const DEFAULT_DISALLOW_DELETE = false;
 const HOST = 'https://pwpush.com'
 const PERMALINK = `${HOST}/p`
 
@@ -18,7 +19,8 @@ axios.defaults.adapter = httpAdapter
 const objDefault = {
   password: 'MyVerySecretP@sswd2BeBroken',
   expire_days: '7',
-  expire_views: '5'
+  expire_views: '5',
+  disallow_delete: false,
 }
 const responseValid = require('./fixture/jsonValid.json')
 const responseInvalid = require('./fixture/jsonInvalid.json')
@@ -81,8 +83,11 @@ test(`Should have ${objDefault.expire_days} as default value for --days flag`, (
 test(`Should have ${objDefault.expire_views} as default value for --views flag`, () => {
   expect(DEFAULT_EXPIRE_VIEWS).toBe(objDefault.expire_views)
 })
+test(`Should have ${objDefault.disallow_delete} as default value for --disallow-delete flag`, () => {
+  expect(DEFAULT_DISALLOW_DELETE).toBe(objDefault.disallow_delete)
+})
 test(`Should allow weak password if --allow-weak flag is set`, () => {
-  expect(() => {  
+  expect(() => {
     pwpush(Object.assign({}, objDefault, {
       password: 'weakpass',
       allow_weak: true,
@@ -90,10 +95,27 @@ test(`Should allow weak password if --allow-weak flag is set`, () => {
   })
   .not.toThrow()
 })
+test(`Should disallow viewers to delete password if --disallow-delete flag is set`, (done) => {
+  mockRequest(responseValid)
+
+  pwpush({ 'disallow-delete': true, password: objDefault.password })
+    .then((res) => {
+      result = querystring.parse(res._.config.data)
+      expected = {
+        'password[payload]': objDefault.password,
+        'password[expire_after_days]': objDefault.expire_days,
+        'password[expire_after_views]': objDefault.expire_views,
+        'password[deletable_by_viewer]': 'on',
+      }
+
+      expect(result).toEqual(expected)
+      done()
+    })
+})
 
 test(`Should call pwpush.com with default request parameters`, (done) => {
   mockRequest(responseValid)
-  
+
   pwpush({password: objDefault.password})
     .then((res) => {
       result = querystring.parse(res._.config.data)
@@ -110,7 +132,7 @@ test(`Should call pwpush.com with default request parameters`, (done) => {
 })
 test(`Should call pwpush.com API with custom request parameters`, (done) => {
   mockRequest(responseValid)
-  
+
   pwpush(
     {
       password: objDefault.password,
@@ -132,7 +154,7 @@ test(`Should call pwpush.com API with custom request parameters`, (done) => {
 })
 test(`Should return an text message with "${PERMALINK}/${responseValid.url_token}" when response is valid`, (done) => {
   mockRequest(responseValid)
-  
+
   pwpush(
     {
       password: objDefault.password,

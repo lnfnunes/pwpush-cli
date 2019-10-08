@@ -10,9 +10,10 @@ const showHelp = (txt = '\r') => {
     \r  $ pwpush <password> [parameters] [options]
 
     \rParameters
-    \r  --days  | -d  Days until the password is deleted. Default is ${pwpush.DEFAULT_EXPIRE_DAYS}
-    \r  --views | -v  Number of visualizations until the password is deleted. Default is ${pwpush.DEFAULT_EXPIRE_VIEWS}
-    \r  --list  | -l  List last ${pwpush.DEFAULT_LAST_ITEMS} pushed passwords.
+    \r  --days            | -d  Days until the password is deleted. Default is ${pwpush.DEFAULT_EXPIRE_DAYS}
+    \r  --views           | -v  Number of visualizations until the password is deleted. Default is ${pwpush.DEFAULT_EXPIRE_VIEWS}
+    \r  --list            | -l  List last ${pwpush.DEFAULT_LAST_ITEMS} pushed passwords.
+    \r  --disallow-delete | -r  Disallow viewers to delete password before expiration Default is ${pwpush.DEFAULT_ALLOW_DELETE}
 
     \rOptions
     \r  --allow-weak  Allow weak passwords to be used.
@@ -27,10 +28,11 @@ const showHelp = (txt = '\r') => {
 }
 
 const cli = parseArgs(process.argv.slice(2), {
-  boolean: ['version', 'help', 'allow-weak', 'list'],
+  boolean: ['version', 'help', 'allow-weak', 'allow-delete', 'list'],
   alias: {
     d: 'days',
     v: 'views',
+    r: 'disallow-delete',
     l: 'list',
     h: 'help',
   },
@@ -60,6 +62,7 @@ try {
     password: cli._[0],
     expire_days: cli.days,
     expire_views: cli.views,
+    allow_delete: cli['disallow-delete'],
     allow_weak: cli['allow-weak'],
   })
   .then(res => {
