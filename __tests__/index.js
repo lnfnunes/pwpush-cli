@@ -98,14 +98,13 @@ test(`Should allow weak password if --allow-weak flag is set`, () => {
 test(`Should disallow viewers to delete password if --disallow-delete flag is set`, (done) => {
   mockRequest(responseValid)
 
-  pwpush({ 'disallow-delete': true, password: objDefault.password })
+  pwpush({ disallow_delete: true, password: objDefault.password })
     .then((res) => {
       result = querystring.parse(res._.config.data)
       expected = {
         'password[payload]': objDefault.password,
         'password[expire_after_days]': objDefault.expire_days,
         'password[expire_after_views]': objDefault.expire_views,
-        'password[deletable_by_viewer]': 'on',
       }
 
       expect(result).toEqual(expected)

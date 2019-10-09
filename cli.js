@@ -62,7 +62,7 @@ try {
     password: cli._[0],
     expire_days: cli.days,
     expire_views: cli.views,
-    allow_delete: cli['disallow-delete'],
+    disallow_delete: cli['disallow-delete'],
     allow_weak: cli['allow-weak'],
   })
   .then(res => {
