@@ -50,6 +50,9 @@ Default value: `5`
 
 Number of visualizations until the password is deleted.
 
+### --disallow-delete | -r
+Disallow the viewer to delete the password before expiration (by default viewers are allowed to delete the password)
+
 ## Options
 
 ###  --allow-weak
