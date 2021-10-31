@@ -33,7 +33,7 @@
   },
   "main": "cli.js",
   "engines": {
-    "node": ">=8"
+    "node": ">=16"
   },
   "scripts": {
     "prepublish": "npm test",
